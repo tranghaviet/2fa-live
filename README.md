@@ -27,6 +27,14 @@ npm run build
 
 The packaged extension files are emitted to `dist`.
 
+Package a Chrome-ready zip:
+
+```bash
+npm run pack:extension
+```
+
+The zip is created at `2fa-live-0.1.0.zip` with `manifest.json` at the archive root.
+
 ## Author
 
 Trang Ha Viet
