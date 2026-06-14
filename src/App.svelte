@@ -1,38 +1,53 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { generateTotp, secondsUntilNextCode, TotpSecretError } from './totp';
+  import {
+    DEFAULT_PERIOD_SECONDS,
+    generateTotp,
+    parseTotpInput,
+    secondsUntilNextCode,
+    TotpSecretError,
+  } from './totp';
 
-  let secret = '';
+  let input = '';
   let code = '';
   let error = '';
   let remainingSeconds = secondsUntilNextCode();
+  let activePeriodSeconds = DEFAULT_PERIOD_SECONDS;
   let copied = false;
   let timerId: number | undefined;
   let generationId = 0;
   let secretInput: HTMLInputElement;
 
-  $: progress = `${(remainingSeconds / 30) * 100}%`;
+  $: progress = `${(remainingSeconds / activePeriodSeconds) * 100}%`;
   $: copyDisabled = !code || Boolean(error);
 
   async function refreshCode() {
     const currentGeneration = ++generationId;
-    remainingSeconds = secondsUntilNextCode();
     copied = false;
 
-    if (!secret.trim()) {
+    if (!input.trim()) {
       code = '';
       error = '';
+      activePeriodSeconds = DEFAULT_PERIOD_SECONDS;
+      remainingSeconds = secondsUntilNextCode();
       return;
     }
 
     try {
-      const nextCode = await generateTotp(secret);
+      const parsedInput = parseTotpInput(input);
+      const now = Date.now();
+      activePeriodSeconds = parsedInput.periodSeconds;
+      remainingSeconds = secondsUntilNextCode(now, activePeriodSeconds);
+
+      const nextCode = await generateTotp(parsedInput.secret, now, activePeriodSeconds);
       if (currentGeneration !== generationId) return;
       code = nextCode;
       error = '';
     } catch (caughtError) {
       if (currentGeneration !== generationId) return;
       code = '';
+      activePeriodSeconds = DEFAULT_PERIOD_SECONDS;
+      remainingSeconds = secondsUntilNextCode();
       error =
         caughtError instanceof TotpSecretError
           ? caughtError.message
@@ -41,7 +56,7 @@
   }
 
   function handleSecretInput(event: Event) {
-    secret = (event.currentTarget as HTMLInputElement).value;
+    input = (event.currentTarget as HTMLInputElement).value;
     void refreshCode();
   }
 
@@ -55,11 +70,11 @@
     secretInput.focus();
     void refreshCode();
     timerId = window.setInterval(() => {
-      const nextRemaining = secondsUntilNextCode();
+      const nextRemaining = secondsUntilNextCode(Date.now(), activePeriodSeconds);
       const expired = nextRemaining > remainingSeconds;
       remainingSeconds = nextRemaining;
 
-      if (expired || (secret.trim() && !code && !error)) {
+      if (expired || (input.trim() && !code && !error)) {
         void refreshCode();
       }
     }, 250);
@@ -89,7 +104,7 @@
       spellcheck="false"
       placeholder="JBSWY3DPEHPK3PXP"
       bind:this={secretInput}
-      value={secret}
+      value={input}
       on:input={handleSecretInput}
     />
   </label>

@@ -1,5 +1,5 @@
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-const DEFAULT_PERIOD_SECONDS = 30;
+export const DEFAULT_PERIOD_SECONDS = 30;
 const DEFAULT_DIGITS = 6;
 
 export class TotpSecretError extends Error {
@@ -11,6 +11,41 @@ export class TotpSecretError extends Error {
 
 export function normalizeSecret(secret: string) {
   return secret.replace(/[\s-]/g, '').replace(/=+$/g, '').toUpperCase();
+}
+
+export function parseTotpInput(input: string) {
+  const trimmedInput = input.trim();
+
+  if (!trimmedInput.toLowerCase().startsWith('otpauth://')) {
+    return {
+      secret: trimmedInput,
+      periodSeconds: DEFAULT_PERIOD_SECONDS,
+    };
+  }
+
+  let url: URL;
+  try {
+    url = new URL(trimmedInput);
+  } catch {
+    throw new TotpSecretError('Invalid otpauth URL.');
+  }
+
+  if (url.protocol !== 'otpauth:' || url.hostname.toLowerCase() !== 'totp') {
+    throw new TotpSecretError('Only otpauth TOTP URLs are supported.');
+  }
+
+  const secret = url.searchParams.get('secret') ?? '';
+  const periodParam = url.searchParams.get('period');
+  const periodSeconds = periodParam ? Number(periodParam) : DEFAULT_PERIOD_SECONDS;
+
+  if (!Number.isInteger(periodSeconds) || periodSeconds <= 0) {
+    throw new TotpSecretError('Period must be a positive number of seconds.');
+  }
+
+  return {
+    secret,
+    periodSeconds,
+  };
 }
 
 export function secondsUntilNextCode(now = Date.now(), periodSeconds = DEFAULT_PERIOD_SECONDS) {
@@ -77,4 +112,3 @@ export function decodeBase32(secret: string) {
 
   return new Uint8Array(bytes);
 }
-

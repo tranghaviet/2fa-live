@@ -34,3 +34,5 @@ Trang Ha Viet
 ## Secret Format
 
 Paste the Base32 secret provided by your service, usually from an authenticator setup screen. Spaces are ignored.
+
+You can also paste an `otpauth://totp/...` URL. 2FA Live extracts the `secret` value and uses the URL's `period` value when present.
