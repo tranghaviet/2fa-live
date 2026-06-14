@@ -37,4 +37,3 @@ try {
 run('zip', ['-r', '-FS', archivePath, '.'], { cwd: distDir });
 
 console.log(`Packed ${archiveName}`);
-

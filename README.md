@@ -1,6 +1,12 @@
 # 2FA Live
 
+<p align="center">
+  <img src="public/icons/avatar.png" alt="2FA Live avatar" width="96" height="96">
+</p>
+
 Open-source browser extension for showing a TOTP 2FA code instantly from a shared secret.
+
+![2FA Live popup screenshot](public/screenshots/popup.png)
 
 ## Features
 
@@ -9,6 +15,20 @@ Open-source browser extension for showing a TOTP 2FA code instantly from a share
 - Shows the countdown to the next code.
 - Copies the current code with one click.
 - Does not send secrets anywhere.
+
+## Secret Format
+
+Paste the Base32 secret provided by your service, usually from an authenticator setup screen. Spaces are ignored.
+
+You can also paste an `otpauth://totp/...` URL. 2FA Live extracts the `secret` value and uses the URL's `period` value when present.
+
+## Author
+
+Trang Ha Viet
+
+## Source code
+
+https://github.com/tranghaviet/2fa-live
 
 ## Development
 
@@ -33,14 +53,4 @@ Package a Chrome-ready zip:
 npm run pack:extension
 ```
 
-The zip is created at `2fa-live-0.1.0.zip` with `manifest.json` at the archive root.
-
-## Author
-
-Trang Ha Viet
-
-## Secret Format
-
-Paste the Base32 secret provided by your service, usually from an authenticator setup screen. Spaces are ignored.
-
-You can also paste an `otpauth://totp/...` URL. 2FA Live extracts the `secret` value and uses the URL's `period` value when present.
+The command regenerates the extension icons, builds `dist`, and creates `2fa-live-0.1.0.zip` with `manifest.json` at the archive root.
