@@ -39,6 +39,8 @@ npm run dev
 
 For Chrome/Chromium development, open `chrome://extensions`, enable Developer mode, and load the generated extension from the Vite/CRXJS development output.
 
+For Firefox development, run a Firefox build and load `dist/manifest.json` as a temporary add-on from `about:debugging#/runtime/this-firefox`.
+
 Build a production extension:
 
 ```bash
@@ -53,4 +55,18 @@ Package a Chrome-ready zip:
 npm run pack:extension
 ```
 
-The command regenerates the extension icons, builds `dist`, and creates `2fa-live-0.1.0.zip` with `manifest.json` at the archive root.
+The command builds `dist` and creates `2fa-live-0.1.0-chrome.zip` with `manifest.json` at the archive root.
+
+Build for Firefox:
+
+```bash
+npm run build:firefox
+```
+
+Package a Firefox-ready XPI archive:
+
+```bash
+npm run pack:firefox
+```
+
+The command builds the Firefox-targeted manifest and creates `2fa-live-0.1.0-firefox.xpi`.
