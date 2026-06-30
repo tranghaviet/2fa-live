@@ -22,6 +22,11 @@ Paste the Base32 secret provided by your service, usually from an authenticator 
 
 You can also paste an `otpauth://totp/...` URL. 2FA Live extracts the `secret` value and uses the URL's `period` value when present.
 
+## Install
+
+- [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/2-fa-live/)
+- [Chrome Web Store](https://chromewebstore.google.com/detail/2fa-live/nkdlpdmafaoppbjooojbmbeekoeohlah)
+
 ## Author
 
 Trang Ha Viet
